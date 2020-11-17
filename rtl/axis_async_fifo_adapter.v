@@ -168,6 +168,10 @@ wire [ID_WIDTH-1:0]    post_fifo_axis_tid;
 wire [DEST_WIDTH-1:0]  post_fifo_axis_tdest;
 wire [USER_WIDTH-1:0]  post_fifo_axis_tuser;
 
+// CDC for async_fifo reset
+wire                   m_rst_sync;
+reg                    async_fifo_rst;
+
 generate
 
 if (M_KEEP_WIDTH == S_KEEP_WIDTH) begin
@@ -297,6 +301,16 @@ end
 
 endgenerate
 
+// CDC for FIFO reset
+sync_reset sync_m_rst_inst (
+    .clk ( s_clk        ),
+    .rst ( m_rst        ),
+    .out ( m_rst_sync   )
+);
+always @(posedge s_clk) begin
+    async_fifo_rst <= s_rst | m_rst_sync;
+end
+
 axis_async_fifo #(
     .DEPTH(DEPTH),
     .DATA_WIDTH(DATA_WIDTH),
@@ -318,7 +332,7 @@ axis_async_fifo #(
 )
 fifo_inst (
     // Common reset
-    .async_rst(s_rst | m_rst),
+    .async_rst(async_fifo_rst),
     // AXI input
     .s_clk(s_clk),
     .s_axis_tdata(pre_fifo_axis_tdata),
