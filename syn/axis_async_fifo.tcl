@@ -93,4 +93,10 @@ foreach fifo_inst [get_cells -quiet -hier -filter {(ORIG_REF_NAME == axis_async_
     create_waiver -type CDC -id {CDC-6} -user "axis_async_fifo"\
     -desc "The CDC-6 warning is waived for the write pointer in axis_async_fifo, since it is Gray coded." \
     -from [get_pins -quiet "$fifo_inst/wr_ptr_reg_reg[*]/* $fifo_inst/wr_ptr_gray_reg_reg[*]/* $fifo_inst/wr_ptr_sync_gray_reg_reg[*]/*"] -to [get_pins $fifo_inst/wr_ptr_gray_sync1_reg_reg[*]/*]
+
+    # When used as a frame FIFO, Vivado incorrectly identifies the write pointer gating as being
+    # a clock-enable CDC structure
+    create_waiver -type CDC -id {CDC-15} -user "axis_async_fifo"\
+    -desc "The CDC-15 warning is waived for the write pointer in axis_async_fifo, since it is Gray coded." \
+    -from [get_pins -quiet "$fifo_inst/wr_ptr_reg_reg[*]/* $fifo_inst/wr_ptr_gray_reg_reg[*]/* $fifo_inst/wr_ptr_sync_gray_reg_reg[*]/*"] -to [get_pins $fifo_inst/wr_ptr_gray_sync1_reg_reg[*]/*]
 }
