@@ -33,6 +33,8 @@ module axis_arb_mux #
 (
     // Number of AXI stream inputs
     parameter S_COUNT = 4,
+    // Log of number of AXI stream inputs
+    localparam CL_S_COUNT = $clog2(S_COUNT),
     // Width of AXI stream interfaces in bits
     parameter DATA_WIDTH = 8,
     // Propagate tkeep signal
@@ -82,16 +84,18 @@ module axis_arb_mux #
     output wire                          m_axis_tlast,
     output wire [ID_WIDTH-1:0]           m_axis_tid,
     output wire [DEST_WIDTH-1:0]         m_axis_tdest,
-    output wire [USER_WIDTH-1:0]         m_axis_tuser
-);
+    output wire [USER_WIDTH-1:0]         m_axis_tuser,
 
-parameter CL_S_COUNT = $clog2(S_COUNT);
+    /*
+     * Mux select signals, output from arbiter
+     */
+    output wire [S_COUNT-1:0]            grant,
+    output wire                          grant_valid,
+    output wire [CL_S_COUNT-1:0]         grant_encoded
+);
 
 wire [S_COUNT-1:0] request;
 wire [S_COUNT-1:0] acknowledge;
-wire [S_COUNT-1:0] grant;
-wire grant_valid;
-wire [CL_S_COUNT-1:0] grant_encoded;
 
 // internal datapath
 reg  [DATA_WIDTH-1:0] m_axis_tdata_int;

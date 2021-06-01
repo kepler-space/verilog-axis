@@ -136,7 +136,11 @@ UUT (
     .m_axis_tlast(m_axis_tlast),
     .m_axis_tid(m_axis_tid),
     .m_axis_tdest(m_axis_tdest),
-    .m_axis_tuser(m_axis_tuser)
+    .m_axis_tuser(m_axis_tuser),
+    // Mux select signals
+    .grant(),
+    .grant_valid(),
+    .grant_encoded()
 );
 
 endmodule
