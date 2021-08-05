@@ -31,9 +31,8 @@ THE SOFTWARE.
  */
 module axis_async_fifo #
 (
-    // FIFO depth in words
-    // KEEP_WIDTH words per cycle if KEEP_ENABLE set
-    // Rounded up to nearest power of 2 cycles
+    // FIFO depth in words (each word is DATA_WIDTH/KEEP_WIDTH bits if KEEP_ENABLE, DATA_WIDTH bits otherwise)
+    // Rounded up to nearest power of 2
     parameter DEPTH = 4096,
     // Width of AXI stream interfaces in bits
     parameter DATA_WIDTH = 8,
