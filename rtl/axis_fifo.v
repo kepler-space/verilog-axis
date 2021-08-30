@@ -71,7 +71,20 @@ module axis_fifo #
     // Drop incoming frames when full
     // When set, s_axis_tready is always asserted
     // Requires FRAME_FIFO set
-    parameter DROP_WHEN_FULL = 0
+    parameter DROP_WHEN_FULL = 0,
+    /**
+     * If this is set to 1, fill_level will output the number of words in the FIFO, otherwise
+     * it will be tied to 0.
+     */
+    parameter FILL_LEVEL_ENABLE = 0,
+    /**
+     * If this is set to 1, fill_level will increment by 1 with each cycle (i.e. treating each word
+     * as being DATA_WIDTH bits, regardless of KEEP_ENABLE). Otherwise, it will treat each word as
+     * DATA_WIDTH/KEEP_WIDTH bits if KEEP_ENABLE, DATA_WIDTH bits otherwise).
+     */
+    parameter FILL_LEVEL_FULL_WORDS = 0,
+    localparam FILL_LEVEL_STEP = (!FILL_LEVEL_FULL_WORDS && KEEP_ENABLE && (KEEP_WIDTH > 0)) ? KEEP_WIDTH : 1,
+    localparam FILL_LEVEL_WIDTH = $clog2(DEPTH) + 1
 )
 (
     input  wire                   clk,
@@ -115,7 +128,9 @@ module axis_fifo #
     // is written to the FIFO after the first capture. Note that if data is
     // written to the FIFO during the replay, it can also loop around and
     // overwrite the values at the beginning of the FIFO.
-    input wire                    reset_read_ptr
+    input wire                    reset_read_ptr,
+
+    output wire [FILL_LEVEL_WIDTH-1:0] fill_level
 );
 
 parameter ADDR_WIDTH = (KEEP_ENABLE && KEEP_WIDTH > 1) ? $clog2(DEPTH/KEEP_WIDTH) : $clog2(DEPTH);
@@ -204,6 +219,57 @@ assign m_axis_tuser = USER_ENABLE ? m_axis_pipe_reg[PIPELINE_OUTPUT-1][USER_OFFS
 assign status_overflow = overflow_reg;
 assign status_bad_frame = bad_frame_reg;
 assign status_good_frame = good_frame_reg;
+
+generate
+    if (FILL_LEVEL_ENABLE) begin : gen_fill_level
+        reg [FILL_LEVEL_WIDTH-1:0] fill_level_ff;
+
+        /**
+         * In frame FIFO mode, we need to do arithmetic to get the fill level, since the read/write
+         * pointers can change by more than 1 at a time.
+         */
+        if (FRAME_FIFO) begin : gen_ff_fl
+            integer i;
+            reg [ADDR_WIDTH:0]              ram_occupancy;
+            reg [$clog2(PIPELINE_OUTPUT):0] out_pipeline_occupancy;
+
+            always @(*) begin
+                out_pipeline_occupancy = m_axis_tvalid_pipe_reg[0];
+                for (i=1; i<PIPELINE_OUTPUT; i=i+1) begin
+                    out_pipeline_occupancy = out_pipeline_occupancy + m_axis_tvalid_pipe_reg[i];
+                end
+            end
+
+            assign ram_occupancy = wr_ptr_reg - rd_ptr_reg;
+
+            assign fill_level = FILL_LEVEL_STEP * (ram_occupancy + out_pipeline_occupancy);
+        // In non-frame FIFO mode, we can just use a counter, which is cheaper
+        end else begin : gen_non_ff_fl
+            // Convenience signals for below
+            wire sample_in, sample_out;
+
+            assign sample_in  = s_axis_tvalid && s_axis_tready;
+            assign sample_out = m_axis_tvalid && m_axis_tready;
+
+            // Count input and output samples
+            always @(posedge axis_in.clk) begin
+                if (~axis_in.sresetn) begin
+                    fill_level_ff <= '0;
+                end else begin
+                    if (sample_in && !sample_out) begin
+                        fill_level_ff <= fill_level_ff + FILL_LEVEL_STEP;
+                    end else if (!sample_in && sample_out) begin
+                        fill_level_ff <= fill_level_ff - FILL_LEVEL_STEP;
+                    end
+                end
+            end
+
+            assign fill_level = fill_level_ff;
+        end
+    end else begin : no_fill_level
+        assign fill_level = '0;
+    end
+endgenerate
 
 // Write logic
 always @(posedge clk) begin
