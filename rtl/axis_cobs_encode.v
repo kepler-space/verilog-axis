@@ -135,7 +135,9 @@ code_fifo_inst (
     // Status
     .status_overflow(),
     .status_bad_frame(),
-    .status_good_frame()
+    .status_good_frame(),
+    .reset_read_ptr(1'b0),
+    .fill_level()
 );
 
 reg [7:0] data_fifo_in_tdata;

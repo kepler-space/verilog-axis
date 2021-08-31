@@ -194,7 +194,9 @@ frame_fifo_inst (
     // Status
     .status_overflow(),
     .status_bad_frame(),
-    .status_good_frame()
+    .status_good_frame(),
+    .reset_read_ptr(1'b0),
+    .fill_level()
 );
 
 axis_fifo #(
@@ -231,7 +233,9 @@ header_fifo_inst (
     // Status
     .status_overflow(),
     .status_bad_frame(),
-    .status_good_frame()
+    .status_good_frame(),
+    .reset_read_ptr(1'b0),
+    .fill_level()
 );
 
 endmodule
