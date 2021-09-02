@@ -230,7 +230,7 @@ generate
          */
         if (FRAME_FIFO) begin : gen_ff_fl
             integer i;
-            reg [ADDR_WIDTH:0]              ram_occupancy;
+            wire [ADDR_WIDTH:0]             ram_occupancy;
             reg [$clog2(PIPELINE_OUTPUT):0] out_pipeline_occupancy;
 
             always @(*) begin
@@ -252,9 +252,9 @@ generate
             assign sample_out = m_axis_tvalid && m_axis_tready;
 
             // Count input and output samples
-            always @(posedge axis_in.clk) begin
-                if (~axis_in.sresetn) begin
-                    fill_level_ff <= '0;
+            always @(posedge clk) begin
+                if (rst) begin
+                    fill_level_ff <= {FILL_LEVEL_WIDTH{1'b0}};
                 end else begin
                     if (sample_in && !sample_out) begin
                         fill_level_ff <= fill_level_ff + FILL_LEVEL_STEP;
@@ -267,7 +267,7 @@ generate
             assign fill_level = fill_level_ff;
         end
     end else begin : no_fill_level
-        assign fill_level = '0;
+        assign fill_level = {FILL_LEVEL_WIDTH{1'b0}};
     end
 endgenerate
 
