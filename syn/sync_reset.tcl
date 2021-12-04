@@ -25,7 +25,8 @@ foreach inst [get_cells -quiet -hier -filter {(ORIG_REF_NAME == sync_reset || RE
 
     # reset synchronization
     set reset_ffs [get_cells -quiet -hier -regexp ".*/sync_reg_reg\\\[\\d+\\\]" -filter "PARENT == $inst"]
-
-    set_property ASYNC_REG TRUE $reset_ffs
-    set_false_path -to [get_pins -of_objects $reset_ffs -filter {IS_PRESET || IS_RESET}]
+    if {[llength $reset_ffs] > 0} {
+        set_property ASYNC_REG TRUE $reset_ffs
+        set_false_path -to [get_pins -of_objects $reset_ffs -filter {IS_PRESET || IS_RESET}]
+    }
 }
