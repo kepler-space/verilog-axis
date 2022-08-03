@@ -105,8 +105,8 @@ module axis_switch #
     output wire [M_COUNT*USER_WIDTH-1:0] m_axis_tuser
 );
 
-parameter CL_S_COUNT = $clog2(S_COUNT);
-parameter CL_M_COUNT = $clog2(M_COUNT);
+localparam CL_S_COUNT = $clog2(S_COUNT);
+localparam CL_M_COUNT = $clog2(M_COUNT);
 
 integer i, j;
 

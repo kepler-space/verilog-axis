@@ -88,7 +88,7 @@ module axis_crosspoint #
     input  wire [M_COUNT*$clog2(S_COUNT)-1:0] select
 );
 
-parameter CL_S_COUNT = $clog2(S_COUNT);
+localparam CL_S_COUNT = $clog2(S_COUNT);
 
 reg [S_COUNT*DATA_WIDTH-1:0] s_axis_tdata_reg = {S_COUNT*DATA_WIDTH{1'b0}};
 reg [S_COUNT*KEEP_WIDTH-1:0] s_axis_tkeep_reg = {S_COUNT*KEEP_WIDTH{1'b0}};

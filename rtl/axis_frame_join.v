@@ -73,10 +73,10 @@ module axis_frame_join #
     output wire                          busy
 );
 
-parameter CL_S_COUNT = $clog2(S_COUNT);
+localparam CL_S_COUNT = $clog2(S_COUNT);
 
-parameter TAG_WORD_WIDTH = (TAG_WIDTH + DATA_WIDTH - 1) / DATA_WIDTH;
-parameter CL_TAG_WORD_WIDTH = $clog2(TAG_WORD_WIDTH);
+localparam TAG_WORD_WIDTH = (TAG_WIDTH + DATA_WIDTH - 1) / DATA_WIDTH;
+localparam CL_TAG_WORD_WIDTH = $clog2(TAG_WORD_WIDTH);
 
 // state register
 localparam [1:0]
