@@ -98,6 +98,11 @@ wire code_fifo_out_tlast;
 wire code_fifo_out_tuser;
 reg code_fifo_out_tready;
 
+reg [7:0] data_fifo_in_tdata;
+reg data_fifo_in_tvalid;
+reg data_fifo_in_tlast;
+wire data_fifo_in_tready;
+
 assign s_axis_tready = code_fifo_in_tready && data_fifo_in_tready && s_axis_tready_mask;
 
 axis_fifo #(
@@ -139,11 +144,6 @@ code_fifo_inst (
     .reset_read_ptr(1'b0),
     .fill_level()
 );
-
-reg [7:0] data_fifo_in_tdata;
-reg data_fifo_in_tvalid;
-reg data_fifo_in_tlast;
-wire data_fifo_in_tready;
 
 wire [7:0] data_fifo_out_tdata;
 wire data_fifo_out_tvalid;
