@@ -31,6 +31,8 @@ THE SOFTWARE.
  */
 module axis_fifo #
 (
+    // Used as the ram_style directive to mem: set to "block" to force BRAM inference
+    parameter RAM_STYLE = "auto",
     // FIFO depth in words (each word is DATA_WIDTH/KEEP_WIDTH bits if KEEP_ENABLE, DATA_WIDTH bits otherwise)
     // Rounded up to nearest power of 2
     parameter DEPTH = 4096,
@@ -174,7 +176,7 @@ reg [ADDR_WIDTH:0] wr_ptr_reg = {ADDR_WIDTH+1{1'b0}};
 reg [ADDR_WIDTH:0] wr_ptr_cur_reg = {ADDR_WIDTH+1{1'b0}};
 reg [ADDR_WIDTH:0] rd_ptr_reg = {ADDR_WIDTH+1{1'b0}};
 
-reg [WIDTH-1:0] mem[(2**ADDR_WIDTH)-1:0];
+(* ram_style = RAM_STYLE *) reg [WIDTH-1:0] mem[(2**ADDR_WIDTH)-1:0];
 reg [WIDTH-1:0] mem_read_data_reg;
 reg mem_read_data_valid_reg = 1'b0;
 
