@@ -205,6 +205,7 @@ reg [WIDTH-1:0] mem_read_data_reg;
 reg mem_read_data_valid_reg = 1'b0;
 
 wire [WIDTH-1:0] s_axis;
+wire [WIDTH-1:0] m_axis;
 
 (* SHREG_EXTRACT = "NO" *)
 reg [WIDTH-1:0] m_axis_pipe_reg[PIPELINE_OUTPUT-1:0];
@@ -254,14 +255,15 @@ generate
     if (USER_ENABLE) assign s_axis[USER_OFFSET +: USER_WIDTH] = s_axis_tuser;
 endgenerate
 
+assign m_axis = PIPELINE_OUTPUT > 1 ? m_axis_pipe_reg[PIPELINE_OUTPUT-1] : mem_read_data_reg;
 assign m_axis_tvalid = m_axis_tvalid_pipe_reg[PIPELINE_OUTPUT-1];
 
-assign m_axis_tdata = m_axis_pipe_reg[PIPELINE_OUTPUT-1][DATA_WIDTH-1:0];
-assign m_axis_tkeep = KEEP_ENABLE ? m_axis_pipe_reg[PIPELINE_OUTPUT-1][KEEP_OFFSET +: KEEP_WIDTH] : {KEEP_WIDTH{1'b1}};
-assign m_axis_tlast = LAST_ENABLE ? m_axis_pipe_reg[PIPELINE_OUTPUT-1][LAST_OFFSET]               : 1'b1;
-assign m_axis_tid   = ID_ENABLE   ? m_axis_pipe_reg[PIPELINE_OUTPUT-1][ID_OFFSET   +: ID_WIDTH]   : {ID_WIDTH{1'b0}};
-assign m_axis_tdest = DEST_ENABLE ? m_axis_pipe_reg[PIPELINE_OUTPUT-1][DEST_OFFSET +: DEST_WIDTH] : {DEST_WIDTH{1'b0}};
-assign m_axis_tuser = USER_ENABLE ? m_axis_pipe_reg[PIPELINE_OUTPUT-1][USER_OFFSET +: USER_WIDTH] : {USER_WIDTH{1'b0}};
+assign m_axis_tdata = m_axis[DATA_WIDTH-1:0];
+assign m_axis_tkeep = KEEP_ENABLE ? m_axis[KEEP_OFFSET +: KEEP_WIDTH] : {KEEP_WIDTH{1'b1}};
+assign m_axis_tlast = LAST_ENABLE ? m_axis[LAST_OFFSET]               : 1'b1;
+assign m_axis_tid   = ID_ENABLE   ? m_axis[ID_OFFSET   +: ID_WIDTH]   : {ID_WIDTH{1'b0}};
+assign m_axis_tdest = DEST_ENABLE ? m_axis[DEST_OFFSET +: DEST_WIDTH] : {DEST_WIDTH{1'b0}};
+assign m_axis_tuser = USER_ENABLE ? m_axis[USER_OFFSET +: USER_WIDTH] : {USER_WIDTH{1'b0}};
 
 assign s_status_overflow = overflow_reg;
 assign s_status_bad_frame = bad_frame_reg;
