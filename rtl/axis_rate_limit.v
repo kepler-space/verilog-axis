@@ -51,7 +51,11 @@ module axis_rate_limit #
     // Propagate tuser signal
     parameter USER_ENABLE = 1,
     // tuser signal width
-    parameter USER_WIDTH = 1
+    parameter USER_WIDTH = 1,
+    // Rate num and denom width
+    parameter RATE_CONFIG_WIDTH = 8,
+    // Rate accumulator width
+    parameter RATE_ACC_WIDTH = 23
 )
 (
     input  wire                   clk,
@@ -84,9 +88,9 @@ module axis_rate_limit #
     /*
      * Configuration
      */
-    input  wire [7:0]             rate_num,
-    input  wire [7:0]             rate_denom,
-    input  wire                   rate_by_frame
+    input  wire [RATE_CONFIG_WIDTH-1:0]  rate_num,
+    input  wire [RATE_CONFIG_WIDTH-1:0]  rate_denom,
+    input  wire                          rate_by_frame
 );
 
 // internal datapath
@@ -100,7 +104,7 @@ reg  [DEST_WIDTH-1:0] m_axis_tdest_int;
 reg  [USER_WIDTH-1:0] m_axis_tuser_int;
 wire                  m_axis_tready_int_early;
 
-reg [23:0] acc_reg = 24'd0, acc_next;
+reg [RATE_ACC_WIDTH-1:0] acc_reg = '0, acc_next;
 reg pause;
 reg frame_reg = 1'b0, frame_next;
 
@@ -144,7 +148,7 @@ end
 
 always @(posedge clk) begin
     if (rst) begin
-        acc_reg <= 24'd0;
+        acc_reg <= '0;
         frame_reg <= 1'b0;
         s_axis_tready_reg <= 1'b0;
     end else begin
