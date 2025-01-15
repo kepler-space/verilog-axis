@@ -104,7 +104,8 @@ reg  [DEST_WIDTH-1:0] m_axis_tdest_int;
 reg  [USER_WIDTH-1:0] m_axis_tuser_int;
 wire                  m_axis_tready_int_early;
 
-reg [RATE_ACC_WIDTH-1:0] acc_reg = '0, acc_next;
+reg [RATE_ACC_WIDTH-1:0] acc_reg; 
+reg [RATE_ACC_WIDTH-1:0] acc_next;
 reg pause;
 reg frame_reg = 1'b0, frame_next;
 
