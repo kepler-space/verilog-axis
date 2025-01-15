@@ -149,7 +149,7 @@ end
 
 always @(posedge clk) begin
     if (rst) begin
-        acc_reg <= '0;
+        acc_reg <= {RATE_ACC_WIDTH{1'b0}};
         frame_reg <= 1'b0;
         s_axis_tready_reg <= 1'b0;
     end else begin
