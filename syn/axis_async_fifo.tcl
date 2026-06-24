@@ -57,7 +57,7 @@ foreach fifo_inst [get_cells -quiet -hier -filter {(ORIG_REF_NAME == axis_async_
             continue
         }
         axis_async_fifo_dbg [format {004e}]
-        set read_clk [get_clocks -quiet -of_objects $rd_ptr0_c_pin]
+        set read_clk [get_clocks -of_objects [get_pins $rd_ptr0_c_pin]]
         axis_async_fifo_dbg [format {004f}]
         if {[llength $read_clk]} {
             set read_clk_period [get_property -min PERIOD $read_clk]
