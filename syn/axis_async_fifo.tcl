@@ -40,7 +40,7 @@ foreach fifo_inst [get_cells -quiet -hier -filter {(ORIG_REF_NAME == axis_async_
 
         # get clock periods
         axis_async_fifo_dbg [format {004 fifo=%s before set read_clk get_clocks rd_ptr_reg_reg[0]/C} $fifo_inst]
-        set rd_ptr0_cell_name [format {%s/rd_ptr_reg_reg[0]} $fifo]
+        set rd_ptr0_cell_name [format {%s/rd_ptr_reg_reg[0]} $fifo_inst]
         set rd_ptr0_cell [get_cells -quiet $rd_ptr0_cell_name]
 
         if {[llength $rd_ptr0_cell] != 1} {
