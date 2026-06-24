@@ -41,22 +41,24 @@ foreach fifo_inst [get_cells -quiet -hier -filter {(ORIG_REF_NAME == axis_async_
         # get clock periods
         axis_async_fifo_dbg [format {004 fifo=%s before set read_clk get_clocks rd_ptr_reg_reg[0]/C} $fifo_inst]
         set rd_ptr0_cell_name [format {%s/rd_ptr_reg_reg[0]} $fifo_inst]
+        axis_async_fifo_dbg [format {004a}]
         set rd_ptr0_cell [get_cells -quiet $rd_ptr0_cell_name]
-
+        axis_async_fifo_dbg [format {004b}]
         if {[llength $rd_ptr0_cell] != 1} {
             puts "WARNING: expected one cell $rd_ptr0_cell_name, got [llength $rd_ptr0_cell]"
             continue
         }
-
+        axis_async_fifo_dbg [format {004c}]
+        
         set rd_ptr0_c_pin [get_pins -quiet -of_objects $rd_ptr0_cell -filter {REF_PIN_NAME == C}]
-
+        axis_async_fifo_dbg [format {004d}]
         if {[llength $rd_ptr0_c_pin] != 1} {
             puts "WARNING: expected one C pin on $rd_ptr0_cell, got [llength $rd_ptr0_c_pin]"
             continue
         }
-
+        axis_async_fifo_dbg [format {004e}]
         set read_clk [get_clocks -quiet -of_objects $rd_ptr0_c_pin]
-
+        axis_async_fifo_dbg [format {004f}]
         if {[llength $read_clk]} {
             set read_clk_period [get_property -min PERIOD $read_clk]
         } else {
